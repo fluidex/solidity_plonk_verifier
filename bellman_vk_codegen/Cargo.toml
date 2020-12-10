@@ -5,8 +5,11 @@ authors = ["Alex Vlasov <alex.m.vlasov@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-bellman = { package = "bellman_ce", git = "https://github.com/matter-labs/bellman", branch = "plonk_release" }
+bellman_ce = { git = "https://github.com/Fluidex/bellman", branch = "plonk_release", default-features = false, features = ["plonk"] } # active features depend on build type
 handlebars = "3.*"
 hex = "*"
 serde_json = "1.*"
 web3 = {version = "0.8.*", default_features = false }
+
+[features]
+default = ["bellman_ce/multicore"]

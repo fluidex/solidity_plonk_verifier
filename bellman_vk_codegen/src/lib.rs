@@ -1,8 +1,8 @@
-use bellman::pairing::ff::{PrimeField, PrimeFieldRepr};
-use bellman::pairing::{Engine, CurveAffine};
-use bellman::plonk::better_cs::keys::{VerificationKey, Proof};
-use bellman::pairing::bn256::{Bn256, Fr};
-use bellman::plonk::better_cs::cs::PlonkCsWidth4WithNextStepParams;
+use bellman_ce::pairing::ff::{PrimeField, PrimeFieldRepr};
+use bellman_ce::pairing::{Engine, CurveAffine};
+use bellman_ce::plonk::better_cs::keys::{VerificationKey, Proof};
+use bellman_ce::pairing::bn256::{Bn256, Fr};
+use bellman_ce::plonk::better_cs::cs::PlonkCsWidth4WithNextStepParams;
 
 use handlebars::*;
 
@@ -10,7 +10,7 @@ use serde_json::value::{Map};
 
 use web3::types::U256;
 
-pub fn render_verification_key(vk: &VerificationKey<Bn256, PlonkCsWidth4WithNextStepParams>, render_to_path: &str) {
+pub fn render_verification_key(vk: &VerificationKey<Bn256, PlonkCsWidth4WithNextStepParams>, template_path: &str, render_to_path: &str) {
     let mut map = Map::new();
 
     let domain_size = vk.n.next_power_of_two().to_string();
@@ -19,7 +19,7 @@ pub fn render_verification_key(vk: &VerificationKey<Bn256, PlonkCsWidth4WithNext
     let num_inputs = vk.num_inputs.to_string();
     map.insert("num_inputs".to_owned(), to_json(num_inputs));
 
-    let domain = bellman::plonk::domains::Domain::<Fr>::new_for_size(vk.n.next_power_of_two() as u64).unwrap();
+    let domain = bellman_ce::plonk::domains::Domain::<Fr>::new_for_size(vk.n.next_power_of_two() as u64).unwrap();
     let omega = domain.generator;
     map.insert("omega".to_owned(), to_json(render_scalar_to_hex(&omega)));
 
@@ -63,7 +63,7 @@ pub fn render_verification_key(vk: &VerificationKey<Bn256, PlonkCsWidth4WithNext
     let mut handlebars = Handlebars::new();
 
     // register template from a file and assign a name to it
-    handlebars.register_template_file("contract", "./template.sol").expect("must read the template");
+    handlebars.register_template_file("contract", template_path).expect("must read the template");
 
     // make data and render it
     // println!("{}", handlebars.render("contract", &map).unwrap());
@@ -196,7 +196,7 @@ mod tests {
             std::fs::File::open("./deposit_vk.key").unwrap()
         );
         let vk = VerificationKey::<Bn256, PlonkCsWidth4WithNextStepParams>::read(&mut reader).unwrap();
-        render_verification_key(&vk, "../Verifier.sol");
+        render_verification_key(&vk, "./template.sol", "../Verifier.sol");
     }
 
     #[test]
@@ -205,7 +205,7 @@ mod tests {
             std::fs::File::open("./deposit_vk.key").unwrap()
         );
         let vk = VerificationKey::<Bn256, PlonkCsWidth4WithNextStepParams>::read(&mut reader).unwrap();
-        render_verification_key(&vk, "./test.sol");
+        render_verification_key(&vk, "./template.sol", "./test.sol");
 
         let mut reader = std::io::BufReader::with_capacity(1<<24,
             std::fs::File::open("./deposit_proof.proof").unwrap()
@@ -235,7 +235,7 @@ mod tests {
             std::fs::File::open("./xor_vk.key").unwrap()
         );
         let vk = VerificationKey::<Bn256, PlonkCsWidth4WithNextStepParams>::read(&mut reader).unwrap();
-        render_verification_key(&vk, "./xor.sol");
+        render_verification_key(&vk, "./template.sol", "./xor.sol");
 
         let mut reader = std::io::BufReader::with_capacity(1<<24,
             std::fs::File::open("./xor_proof.proof").unwrap()
