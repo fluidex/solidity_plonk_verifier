@@ -10,7 +10,17 @@ use serde_json::value::{Map};
 
 use web3::types::U256;
 
-pub fn render_verification_key(vk: &VerificationKey<Bn256, PlonkCsWidth4WithNextStepParams>, template_path: &str, render_to_path: &str) {
+pub fn render_verification_key(vk: &VerificationKey<Bn256, PlonkCsWidth4WithNextStepParams>, template_file: &str, render_to_path: &str) {
+    let template = std::fs::read_to_string(template_file).expect("must read the template");
+    render_verification_key_from_template(vk, &template, render_to_path);
+}
+
+pub fn render_verification_key_from_default_template(vk: &VerificationKey<Bn256, PlonkCsWidth4WithNextStepParams>, render_to_path: &str) {
+    let template = include_str!("../template.sol");
+    render_verification_key_from_template(vk, template, render_to_path);
+}
+
+pub fn render_verification_key_from_template(vk: &VerificationKey<Bn256, PlonkCsWidth4WithNextStepParams>, template: &str, render_to_path: &str) {
     let mut map = Map::new();
 
     let domain_size = vk.n.next_power_of_two().to_string();
@@ -62,8 +72,8 @@ pub fn render_verification_key(vk: &VerificationKey<Bn256, PlonkCsWidth4WithNext
 
     let mut handlebars = Handlebars::new();
 
-    // register template from a file and assign a name to it
-    handlebars.register_template_file("contract", template_path).expect("must read the template");
+    // register template and assign a name to it
+    handlebars.register_template_string("contract", template).expect("must register the template");
 
     // make data and render it
     // println!("{}", handlebars.render("contract", &map).unwrap());
