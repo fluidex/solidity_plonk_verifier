@@ -1,11 +1,11 @@
 [package]
 name = "bellman_vk_codegen"
-version = "0.1.0"
-authors = ["Alex Vlasov <alex.m.vlasov@gmail.com>"]
+version = "0.2.0"
+authors = ["Alex Vlasov <alex.m.vlasov@gmail.com>", "Haoyu Lin <chris.haoyul@gmail.com", "Zhuo Zhang <mycinbrin@gmail.com"]
 edition = "2018"
 
 [dependencies]
-bellman_ce = { git = "https://github.com/Fluidex/bellman", branch = "plonk_release", default-features = false, features = ["plonk"] } # active features depend on build type
+bellman_ce = { git = "https://github.com/matter-labs/bellman", branch = "beta", default-features = false, features = ["plonk"] } # active features depend on build type
 handlebars = "3.*"
 hex = "*"
 serde_json = "1.*"
